@@ -111,3 +111,7 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 func (s Scanner) Type() detectorspb.DetectorType {
 	return detectorspb.DetectorType_SlackWebhook
 }
+
+func (s Scanner) IsFalsePositive(_ detectors.Result) (bool, string) {
+	return false, ""
+}

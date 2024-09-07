@@ -50,6 +50,12 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 			if strings.Contains(match[0], "httpwatch.com") {
 				continue
 			}
+			if strings.Contains(match[0], "example.com") {
+				continue
+			}
+			if strings.Contains(match[0], "host.com") {
+				continue
+			}
 		}
 
 		urlMatch := match[0]

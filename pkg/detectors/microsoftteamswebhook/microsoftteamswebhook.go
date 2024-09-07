@@ -106,3 +106,7 @@ func verifyWebhook(ctx context.Context, client *http.Client, webhookURL string) 
 func (s Scanner) Type() detectorspb.DetectorType {
 	return detectorspb.DetectorType_MicrosoftTeamsWebhook
 }
+
+func (s Scanner) IsFalsePositive(_ detectors.Result) (bool, string) {
+	return false, ""
+}
