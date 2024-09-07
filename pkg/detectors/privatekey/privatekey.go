@@ -1,10 +1,12 @@
 package privatekey
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +15,8 @@ import (
 	regexp "github.com/wasilibs/go-re2"
 	"golang.org/x/crypto/ssh"
 
+	_ "embed"
+
 	"github.com/trufflesecurity/trufflehog/v3/pkg/common"
 	"github.com/trufflesecurity/trufflehog/v3/pkg/detectors"
 	"github.com/trufflesecurity/trufflehog/v3/pkg/pb/detectorspb"
@@ -20,6 +24,16 @@ import (
 
 type Scanner struct {
 	IncludeExpired bool
+}
+
+//go:embed "fp-fingerprints.txt"
+var rawFpFingerprints []byte
+var fpFingerprints []string
+
+func init() {
+	for _, b := range bytes.Split(rawFpFingerprints, []byte("\n")) {
+		fpFingerprints = append(fpFingerprints, string(b))
+	}
 }
 
 // Ensure the Scanner satisfies the interface at compile time.
@@ -84,6 +98,13 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 			continue
 		}
 
+		s1.ExtraData["fingerprint"] = fingerprint
+
+		// skip known false positives (e.g. private keys in tests and documentations)
+		if slices.Contains(fpFingerprints, fingerprint) {
+			continue
+		}
+
 		if verify {
 			var (
 				wg                 sync.WaitGroup
@@ -137,8 +158,6 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 				for k, v := range extraData.data {
 					s1.ExtraData[k] = v
 				}
-			} else {
-				s1.ExtraData = nil
 			}
 			if len(verificationErrors.errors) > 0 {
 				s1.SetVerificationError(fmt.Errorf("verification failures: %s", strings.Join(verificationErrors.errors, ", ")), token)

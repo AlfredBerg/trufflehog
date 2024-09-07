@@ -26,6 +26,7 @@ const (
 type Scanner struct {
 	// Verification timeout. Defaults to 5 seconds if unset.
 	verificationTimeout time.Duration
+	allowKnownTestSites bool
 }
 
 // Ensure the Scanner satisfies the interface at compile time.
@@ -51,6 +52,60 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 	for _, match := range matches {
 		urlMatch := match[0]
 		password := match[1]
+
+		if !s.allowKnownTestSites {
+			if strings.Contains(match[0], "httpbin.org") {
+				continue
+			}
+			if strings.Contains(match[0], "httpwatch.com") {
+				continue
+			}
+			if strings.Contains(match[0], "example.com") {
+				continue
+			}
+			if strings.Contains(match[0], "host.com") {
+				continue
+			}
+			if strings.Contains(match[0], "dummy.faketld") {
+				continue
+			}
+			if strings.Contains(match[0], "host.faketld") {
+				continue
+			}
+			if strings.HasSuffix(match[0], "@host") {
+				continue
+			}
+			if strings.Contains(match[0], "@host:") {
+				continue
+			}
+			if strings.HasSuffix(match[0], "@foo.bar") {
+				continue
+			}
+			if strings.Contains(match[0], "www.bogus.net") {
+				continue
+			}
+			if strings.Contains(match[0], "user:pass") {
+				continue
+			}
+			if strings.Contains(match[0], "user:pass") {
+				continue
+			}
+			if strings.Contains(match[0], "TestUser:Password") {
+				continue
+			}
+			if strings.Contains(match[0], "http://usr2:ps2") {
+				continue
+			}
+			if strings.Contains(match[0], "http://usr:some%2A%2Fweird%20pass") {
+				continue
+			}
+			if strings.Contains(match[0], "@another.url") {
+				continue
+			}
+			if strings.Contains(match[0], "mailto:pytorch-marketing") {
+				continue
+			}
+		}
 
 		// Skip findings where the password only has "*" characters, this is a redacted password
 		if strings.Trim(password, "*") == "" {

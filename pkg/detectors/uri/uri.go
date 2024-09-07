@@ -56,6 +56,57 @@ func (s Scanner) FromData(ctx context.Context, verify bool, data []byte) (result
 			if strings.Contains(match[0], "host.com") {
 				continue
 			}
+			if strings.Contains(match[0], "dummy.faketld") {
+				continue
+			}
+			if strings.Contains(match[0], "host.faketld") {
+				continue
+			}
+			if strings.HasSuffix(match[0], "@host") {
+				continue
+			}
+			if strings.Contains(match[0], "@host:") {
+				continue
+			}
+			if strings.HasSuffix(match[0], "@foo.bar") {
+				continue
+			}
+			if strings.Contains(match[0], "www.bogus.net") {
+				continue
+			}
+			if strings.Contains(match[0], "user:pass") {
+				continue
+			}
+			if strings.Contains(match[0], "user:pass") {
+				continue
+			}
+			if strings.Contains(match[0], "TestUser:Password") {
+				continue
+			}
+			if strings.Contains(match[0], "http://usr2:ps2") {
+				continue
+			}
+			if strings.Contains(match[0], "http://usr:some%2A%2Fweird%20pass") {
+				continue
+			}
+			if strings.Contains(match[0], "@another.url") {
+				continue
+			}
+			if strings.Contains(match[0], "mailto:pytorch-marketing") {
+				continue
+			}
+			if strings.Contains(match[0], "host.tld") {
+				continue
+			}
+			if strings.Contains(match[0], "http://%3Fam:pa%3Fsword@") {
+				continue
+			}
+			if strings.Contains(match[0], "http://j%40ne:password@") {
+				continue
+			}
+			if strings.Contains(match[0], "http://jane:p%40ssword@") {
+				continue
+			}
 		}
 
 		urlMatch := match[0]
